@@ -44,10 +44,9 @@ const seed = (data) => {
             // 2. insert data
             .then(() => {
                 const queryStr = format(
-                    `INSERT INTO topics (slug, description)
-                    VALUES
-                    %L
-                    RETURNING *;`,
+                    `INSERT INTO topics (
+                    slug, description
+                    ) VALUES %L;`,
                     topicData.map((topic) => [topic.slug, topic.description])
                 )
                 return db.query(queryStr)
@@ -65,13 +64,12 @@ const seed = (data) => {
                 )
                 return db.query(queryStr)
             })
-            .then(({ rows }) => {
+            .then(() => {
                 const queryStr = format(
                     `INSERT INTO articles (
                     title, body, votes, topic, author, created_at
                     ) VALUES %L;`,
-                    articleData.map((article) => {
-                        return [
+                    articleData.map((article) => [
                             article.title,
                             article.body,
                             article.votes,
@@ -79,7 +77,7 @@ const seed = (data) => {
                             article.author,
                             article.created_at,
                         ]
-                    })
+                    )
                 )
                 return db.query(queryStr)
             })
@@ -88,20 +86,16 @@ const seed = (data) => {
                     `INSERT INTO comments (
                     author, article_id, votes, created_at, body
                     ) VALUES %L;`,
-                    commentData.map((comment) => {
-                        return [
+                    commentData.map((comment) => [
                             comment.author,
                             comment.article_id,
                             comment.votes,
                             comment.created_at,
                             comment.body,
                         ]
-                    })
+                    )
                 )
                 return db.query(queryStr)
-            })
-            .then(({rows})=> {
-                return console.log(rows)
             })
     )
 }
