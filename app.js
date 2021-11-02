@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express()
 const apiRouter = require('./routes/api-router')
+const {handleCustomErrors, handleServerErrors} = require('./errors')
 
 app.use(express.json())
 
@@ -10,17 +11,7 @@ app.get('/', (req, res, next) => {
     res.status(200).send({ msg: 'Server online' })
 })
 
-// custom errors
-app.use((err, req, res, next)=> {
-    if (err.status && err.msg) {
-        res.status(err.status).send({msg: err.msg})
-    }
-})
-
-// 500 internal server error
-app.use((err, req, res, next) => {
-    console.log({unhandled_error: err})
-    res.status(500).send({ msg: 'Internal server error' })
-})
+app.use(handleCustomErrors)
+app.use(handleServerErrors)
 
 module.exports = app
