@@ -67,13 +67,9 @@ describe('/api/articles/:article_id', () => {
                             // created_at: expect.stringMatching(validTimeStamp),
                             created_at: expect.any(String),
                             votes: expect.any(Number),
-                            // comment_count: expect.any(Number),
+                            comment_count: expect.any(Number),
                         })
                     )
-                    return [
-                        article,
-                        db.query('SELECT * FROM articles WHERE article_id = 1'),
-                    ]
                 })
         })
     })
