@@ -91,21 +91,48 @@ describe('/api/articles/:article_id', () => {
             return request(app)
                 .get(`/api/articles/${idToUse}`)
                 .expect(400)
-                .then(({body})=> {
-                    const {msg} = body
+                .then(({ body }) => {
+                    const { msg } = body
                     expect(msg).toEqual(`Invalid ID: ${idToUse}`)
                 })
         })
         it('status:404, responds with not found when passed ID does not exist on database', () => {
             const idToUse = '9000'
             return request(app)
-            .get(`/api/articles/${idToUse}`)
-            .expect(404)
-            .then(({body})=>{
-                const {msg} = body
-                expect(msg).toEqual(`ID not found: ${idToUse}`)
-            })
+                .get(`/api/articles/${idToUse}`)
+                .expect(404)
+                .then(({ body }) => {
+                    const { msg } = body
+                    expect(msg).toEqual(`ID not found: ${idToUse}`)
+                })
         })
-        
+    })
+    describe('PATCH', () => {
+        it('status:202, responds with the updated article object', () => {
+            const idToUse = 1
+            const incByAmount = 1
+            const reqToUse = {
+                inc_votes: incByAmount,
+            }
+            return request(app)
+                .patch(`/api/articles/${idToUse}`)
+                .send(reqToUse)
+                .expect(202)
+                .then(({ body }) => {
+                    const { article } = body
+                    expect(article).toEqual(
+                        expect.objectContaining({
+                            article_id: 1,
+                            title: 'Living in the shadow of a great man',
+                            body: 'I find this existence challenging',
+                            topic: 'mitch',
+                            author: 'butter_bridge',
+                            created_at: '2020-07-09T20:11:00.000Z',
+                            // comment_count: expect.toEqual(11 + incByAmount),
+                        })
+                    )
+                    expect(article.votes).toEqual(100 + incByAmount)
+                })
+        })
     })
 })

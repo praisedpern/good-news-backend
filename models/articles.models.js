@@ -26,3 +26,15 @@ exports.selectArticleById = (id) => {
         return result
     })
 }
+
+exports.updateArticleVotes = (id, votes) => {
+    let queryStr = `
+        UPDATE articles
+        SET votes = votes + ${votes}
+        WHERE articles.article_id = ${id}
+        RETURNING *;
+    `
+    return db.query(queryStr).then((result)=> {
+        return result
+    })
+}
