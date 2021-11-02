@@ -67,7 +67,7 @@ describe('/api/articles/:article_id', () => {
                     })
                 })
         })
-        it('status:200, responds with second correct article object', () => {
+        it('status:200, responds with a second correct article object', () => {
             const idToUse = '2'
             return request(app)
                 .get(`/api/articles/2`)
@@ -93,8 +93,18 @@ describe('/api/articles/:article_id', () => {
                 .expect(400)
                 .then(({body})=> {
                     const {msg} = body
-                    expect(msg).toEqual(`no article found with ID ${idToUse}`)
+                    expect(msg).toEqual(`Invalid ID: ${idToUse}`)
                 })
+        })
+        it('status:404, responds with not found when passed ID does not exist on database', () => {
+            const idToUse = '9000'
+            return request(app)
+            .get(`/api/articles/${idToUse}`)
+            .expect(404)
+            .then(({body})=>{
+                const {msg} = body
+                expect(msg).toEqual(`ID not found: ${idToUse}`)
+            })
         })
         
     })
