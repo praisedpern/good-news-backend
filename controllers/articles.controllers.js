@@ -6,4 +6,5 @@ exports.getArticleById = ({params}, res, next) => {
         rows[0].comment_count = parseInt(rows[0].comment_count)
         return res.status(200).send({ article: rows[0] })
     })
+    .catch(next)
 }
