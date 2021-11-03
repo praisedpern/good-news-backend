@@ -85,7 +85,7 @@ describe('/api/articles/:article_id', () => {
                 .expect(400)
                 .then(({ body }) => {
                     const { msg } = body
-                    expect(msg).toEqual(`Invalid ID: ${idToUse}`)
+                    expect(msg).toEqual(`Invalid ID`)
                 })
         })
         it('status:404, responds with not found when passed ID not found', () => {
@@ -134,7 +134,7 @@ describe('/api/articles/:article_id', () => {
                 .expect(400)
                 .then(({ body }) => {
                     const { msg } = body
-                    expect(msg).toEqual(`Invalid ID: ${idToUse}`)
+                    expect(msg).toEqual(`Invalid ID`)
                 })
         })
         it('status:404. responds with not found when passed ID not found in db', () => {
