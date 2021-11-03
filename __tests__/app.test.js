@@ -13,7 +13,9 @@ const patchArticleObj = {
     inc_votes: 1,
 }
 
-beforeEach(()=> {patchArticleObj.inc_votes = 1})
+beforeEach(() => {
+    patchArticleObj.inc_votes = 1
+})
 
 describe('/', () => {
     describe('GET', () => {
@@ -109,7 +111,7 @@ describe('/api/articles/:article_id', () => {
                 .expect(200)
                 .then(({ body }) => {
                     responseToCompare = { ...body }
-                    responseToCompare.article.votes += patchArticleObj.inc_votes 
+                    responseToCompare.article.votes += patchArticleObj.inc_votes
                     return
                 })
                 .then(() => {
@@ -133,6 +135,17 @@ describe('/api/articles/:article_id', () => {
                 .then(({ body }) => {
                     const { msg } = body
                     expect(msg).toEqual(`Invalid ID: ${idToUse}`)
+                })
+        })
+        it('status:404. responds with not found when passed ID not found in db', () => {
+            const idToUse = '9000'
+            return request(app)
+                .patch(`/api/articles/${idToUse}`)
+                .send(patchArticleObj)
+                .expect(404)
+                .then(({ body }) => {
+                    const { msg } = body
+                    expect(msg).toEqual(`ID not found: ${idToUse}`)
                 })
         })
     })
