@@ -6,9 +6,8 @@ const {
 exports.getArticleById = ({ params }, res, next) => {
     const id = params.id
     return selectArticleById(id)
-        .then(({ rows }) => {
-            rows[0].comment_count = parseInt(rows[0].comment_count)
-            return res.status(200).send({ article: rows[0] })
+        .then((result) => {
+            return res.status(200).send({ article: result })
         })
         .catch(next)
 }
@@ -18,9 +17,8 @@ exports.patchArticleVotes = ({ params, body }, res, next) => {
     const votes = body.inc_votes
     return updateArticleVotes(id, votes)
         .then(() => {
-            return selectArticleById(id).then(({ rows }) => {
-                rows[0].comment_count = parseInt(rows[0].comment_count)
-                return res.status(202).send({ article: rows[0] })
+            return selectArticleById(id).then((result) => {
+                return res.status(202).send({ article: result })
             })
         })
         .catch(next)
