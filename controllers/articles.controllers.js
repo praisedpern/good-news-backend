@@ -1,6 +1,7 @@
 const {
     selectArticleById,
     updateArticleVotes,
+    selectArticles,
 } = require('../models/articles.models')
 
 exports.getArticleById = ({ params }, res, next) => {
@@ -22,4 +23,11 @@ exports.patchArticleVotes = ({ params, body }, res, next) => {
             })
         })
         .catch(next)
+}
+
+exports.getArticles = (req, res, next) => {
+    return selectArticles().then((result) => {
+        console.log(result)
+        return res.status(200).send({ articles: result })
+    })
 }

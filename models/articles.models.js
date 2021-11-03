@@ -34,3 +34,15 @@ exports.updateArticleVotes = (id, votes) => {
         return result
     })
 }
+exports.selectArticles = () => {
+    return db.query(`
+        SELECT articles.*, COUNT(comments.author)
+        AS comment_count
+        FROM articles
+        LEFT JOIN comments AS comments
+        ON articles.article_id = comments.article_id
+        GROUP BY articles.article_id;
+    `).then(({rows})=> {
+        return rows
+    })
+}

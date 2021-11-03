@@ -41,7 +41,7 @@ describe('/api/topics', () => {
                 .then(({ body }) => {
                     const { topics } = body
                     expect(topics).toBeInstanceOf(Array)
-                    expect(topics).toHaveLength(3)
+                    expect(topics).toHaveLength(testData.topicData.length)
                     topics.forEach((topic) => {
                         expect(topic).toEqual(
                             expect.objectContaining({
@@ -146,6 +146,32 @@ describe('/api/articles/:article_id', () => {
                 .then(({ body }) => {
                     const { msg } = body
                     expect(msg).toEqual(`ID not found: ${idToUse}`)
+                })
+        })
+    })
+})
+
+describe('/api/articles', () => {
+    describe('GET', () => {
+        it('status:200, respons with an array of article objects', () => {
+            return request(app)
+                .get('/api/articles')
+                .expect(200)
+                .then(({ body }) => {
+                    const { articles } = body
+                    expect(articles).toBeInstanceOf(Array)
+                    expect(articles).toHaveLength(testData.articleData.length)
+                    articles.forEach((article) => {
+                        expect.objectContaining({
+                            author: expect.any(String),
+                            title: expect.any(String),
+                            article_id: expect.any(Number),
+                            topic: expect.any(String),
+                            created_at: expect.stringMatching(validTimestamp),
+                            votes: expect.any(Number),
+                            comment_count: expect.any(Number),
+                        })
+                    })
                 })
         })
     })
