@@ -3,12 +3,17 @@ const testData = require('../db/data/test-data/index.js')
 const seed = require('../db/seeds/seed.js')
 const app = require('../app.js')
 const request = require('supertest')
-const { string } = require('pg-format')
 
 beforeEach(() => seed(testData))
 afterAll(() => db.end())
 
 const validTimestamp = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/
+
+const patchArticleObj = {
+    inc_votes: 1,
+}
+
+beforeEach(()=> {patchArticleObj.inc_votes = 1})
 
 describe('/', () => {
     describe('GET', () => {
@@ -81,7 +86,7 @@ describe('/api/articles/:article_id', () => {
                     expect(msg).toEqual(`Invalid ID: ${idToUse}`)
                 })
         })
-        it('status:404, responds with not found when passed ID does not exist on database', () => {
+        it('status:404, responds with not found when passed ID not found', () => {
             const idToUse = '9000'
             return request(app)
                 .get(`/api/articles/${idToUse}`)
@@ -95,48 +100,39 @@ describe('/api/articles/:article_id', () => {
     describe('PATCH', () => {
         it('status:202, responds with the updated article object', () => {
             const idToUse = 1
-            const incByAmount = 1
-            const reqToUse = {
-                inc_votes: incByAmount,
-            }
+            patchArticleObj.inc_votes = 1
+
             let responseToCompare
 
             return request(app)
                 .get(`/api/articles/${idToUse}`)
                 .expect(200)
                 .then(({ body }) => {
-                    responseToCompare = {...body}
-                    responseToCompare.article.votes += 1
+                    responseToCompare = { ...body }
+                    responseToCompare.article.votes += patchArticleObj.inc_votes 
                     return
                 })
                 .then(() => {
                     return request(app)
                         .patch(`/api/articles/${idToUse}`)
-                        .send(reqToUse)
+                        .send(patchArticleObj)
                         .expect(202)
                         .then(({ body }) => {
                             expect(body).toEqual(responseToCompare)
                         })
                 })
         })
-        it.skip('status:400, responds with bad request when passed with invalid ID', () => {
+        it('status:400, responds with bad request when passed with invalid ID', () => {
             const idToUse = 'notAnId'
+            patchArticleObj.inc_votes = 1
+
             return request(app)
-                .get(`/api/articles/${idToUse}`)
+                .patch(`/api/articles/${idToUse}`)
+                .send(patchArticleObj)
                 .expect(400)
                 .then(({ body }) => {
                     const { msg } = body
                     expect(msg).toEqual(`Invalid ID: ${idToUse}`)
-                })
-        })
-        it.skip('status:404, responds with not found when passed ID does not exist on database', () => {
-            const idToUse = '9000'
-            return request(app)
-                .get(`/api/articles/${idToUse}`)
-                .expect(404)
-                .then(({ body }) => {
-                    const { msg } = body
-                    expect(msg).toEqual(`ID not found: ${idToUse}`)
                 })
         })
     })

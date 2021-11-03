@@ -28,6 +28,13 @@ exports.selectArticleById = (id) => {
 }
 
 exports.updateArticleVotes = (id, votes) => {
+    if (!id.match(/^\d+$/)) {
+        return Promise.reject({
+            status: 400,
+            msg: `Invalid ID: ${id}`,
+        })
+    }
+
     let queryStr = `
         UPDATE articles
         SET votes = votes + ${votes}
