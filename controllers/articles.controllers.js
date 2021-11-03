@@ -26,8 +26,8 @@ exports.patchArticleVotes = ({ params, body }, res, next) => {
 }
 
 exports.getArticles = (req, res, next) => {
-    return selectArticles().then((result) => {
-        console.log(result)
+    const {sort_by} = req.query
+    return selectArticles(sort_by).then((result) => {
         return res.status(200).send({ articles: result })
     })
 }

@@ -153,7 +153,7 @@ describe('/api/articles/:article_id', () => {
 
 describe('/api/articles', () => {
     describe('GET', () => {
-        it('status:200, respons with an array of article objects', () => {
+        it('status:200, responds with an array of article objects', () => {
             return request(app)
                 .get('/api/articles')
                 .expect(200)
@@ -173,6 +173,33 @@ describe('/api/articles', () => {
                         })
                     })
                 })
+        })
+        describe('?sort_by', () => {
+            const testSortBy = (sortBy = 'created_at') => {
+                return request(app)
+                    .get(`/api/articles?sort_by=${sortBy}`)
+                    .expect(200)
+                    .then(({ body }) => {
+                        const { articles } = body
+                        expect(articles).toBeSortedBy(sortBy, {
+                            descending: true,
+                        })
+                    })
+            }
+            it('status:200, sorts by date, descending by default', () => {
+                return request(app)
+                    .get(`/api/articles`)
+                    .expect(200)
+                    .then(({ body }) => {
+                        const { articles } = body
+                        expect(articles).toBeSortedBy('created_at', {
+                            descending: true,
+                        })
+                    })
+            })
+            it('status:200, sorts by the field passed in the query', () => {
+                return testSortBy('author')
+            })
         })
     })
 })

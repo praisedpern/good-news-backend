@@ -1,5 +1,5 @@
 const db = require('../db/connection')
-
+const format = require('pg-format')
 
 exports.selectArticleById = (id) => {
     let queryStr = `
@@ -11,7 +11,7 @@ exports.selectArticleById = (id) => {
         WHERE articles.article_id = $1
         GROUP BY articles.article_id;
     `
-    return db.query(queryStr, [id]).then(({rows}) => {
+    return db.query(queryStr, [id]).then(({ rows }) => {
         if (rows.length === 0) {
             return Promise.reject({
                 status: 404,
@@ -19,7 +19,7 @@ exports.selectArticleById = (id) => {
             })
         }
         rows[0].comment_count = parseInt(rows[0].comment_count)
-        return rows[0] 
+        return rows[0]
     })
 }
 
@@ -30,19 +30,21 @@ exports.updateArticleVotes = (id, votes) => {
         WHERE articles.article_id = $2
         RETURNING *;
     `
-    return db.query(queryStr, [votes, id]).then((result)=> {
+    return db.query(queryStr, [votes, id]).then((result) => {
         return result
     })
 }
-exports.selectArticles = () => {
-    return db.query(`
+exports.selectArticles = (sort_by = 'created_at') => {
+    const queryStr = `
         SELECT articles.*, COUNT(comments.author)
         AS comment_count
         FROM articles
         LEFT JOIN comments AS comments
         ON articles.article_id = comments.article_id
-        GROUP BY articles.article_id;
-    `).then(({rows})=> {
+        GROUP BY articles.article_id
+        ORDER BY ${sort_by} DESC;
+    `
+    return db.query(queryStr).then(({ rows }) => {
         return rows
     })
 }
