@@ -266,21 +266,30 @@ describe('/api/articles', () => {
             })
         })
         describe('?topic', () => {
-            it('status:200, filters the articles, returning only those matching the passed topic column', () => {
-                const topicToUse = 'mitch'
+            const filterByTopicTest = (topicToUse, status) => {
                 return request(app)
                     .get(`/api/articles?topic=${topicToUse}`)
-                    .expect(200)
-                    .then(({ body }) => {
-                        const { articles } = body
-                        articles.forEach(article =>{
-                            expect(article).toEqual(
-                                expect.objectContaining({
-                                    topic: topicToUse
-                                })
-                            )
-                        })
+                    .expect(status)
+            }
+            it('status:200, filters the articles, returning only those matching the passed topic column', () => {
+                const topicToUse = 'mitch'
+                return filterByTopicTest(topicToUse, 200).then(({ body }) => {
+                    const { articles } = body
+                    articles.forEach((article) => {
+                        expect(article).toEqual(
+                            expect.objectContaining({
+                                topic: topicToUse,
+                            })
+                        )
                     })
+                })
+            })
+            it('status:404, responds with not found if no articles with topic found', () => {
+                const topicToUse = 'notATopic'
+                return filterByTopicTest(topicToUse, 404).then(({body}) => {
+                    const { msg } = body
+                    expect(msg).toBe(`No articles found with topic: ${topicToUse}`)
+                })
             })
         })
     })

@@ -40,8 +40,6 @@ exports.selectArticles = (sort_by = 'created_at', order = 'desc', topic) => {
     if (!validOrders.includes(order))
         throw { status: 400, msg: 'Invalid query' }
 
-    if (topic) console.log(topic)
-
     let queryStr = `
         SELECT articles.*, COUNT(comments.author)
         AS comment_count
@@ -60,6 +58,12 @@ exports.selectArticles = (sort_by = 'created_at', order = 'desc', topic) => {
         ;
     `
     return db.query(queryStr).then(({ rows }) => {
+        if (rows.length === 0) {
+            return Promise.reject({
+                status: 404,
+                msg: `No articles found with topic: ${topic}`,
+            })
+        }
         if (rows.length) rows[0].comment_count = parseInt(rows[0].comment_count)
         return rows
     })
