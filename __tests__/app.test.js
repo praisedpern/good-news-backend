@@ -256,13 +256,31 @@ describe('/api/articles', () => {
             })
             it('status:400, responds with bad request when passed with invalid order', () => {
                 return request(app)
-                .get(`/api/articles?order=notAnOrder`)
-                .expect(400)
-                .then(({body}) => {
-                    expect(body).toEqual({
-                        msg: 'Invalid query'
+                    .get(`/api/articles?order=notAnOrder`)
+                    .expect(400)
+                    .then(({ body }) => {
+                        expect(body).toEqual({
+                            msg: 'Invalid query',
+                        })
                     })
-                })
+            })
+        })
+        describe('?topic', () => {
+            it('status:200, filters the articles, returning only those matching the passed topic column', () => {
+                const topicToUse = 'mitch'
+                return request(app)
+                    .get(`/api/articles?topic=${topicToUse}`)
+                    .expect(200)
+                    .then(({ body }) => {
+                        const { articles } = body
+                        articles.forEach(article =>{
+                            expect(article).toEqual(
+                                expect.objectContaining({
+                                    topic: topicToUse
+                                })
+                            )
+                        })
+                    })
             })
         })
     })

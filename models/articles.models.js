@@ -34,20 +34,33 @@ exports.updateArticleVotes = (id, votes) => {
         return result
     })
 }
-exports.selectArticles = (sort_by = 'created_at', order = 'desc') => {
-    const validOrders = ['asc','desc']
-    if (!validOrders.includes(order)) throw { status: 400, msg: 'Invalid query'}
-    const queryStr = `
+exports.selectArticles = (sort_by = 'created_at', order = 'desc', topic) => {
+    const validOrders = ['asc', 'desc']
+
+    if (!validOrders.includes(order))
+        throw { status: 400, msg: 'Invalid query' }
+
+    if (topic) console.log(topic)
+
+    let queryStr = `
         SELECT articles.*, COUNT(comments.author)
         AS comment_count
         FROM articles
         LEFT JOIN comments AS comments
         ON articles.article_id = comments.article_id
+        `
+    if (topic) {
+        queryStr += `
+        WHERE topic = '${topic}'
+        `
+    }
+    queryStr += `
         GROUP BY articles.article_id
-        ORDER BY ${sort_by} ${order};
+        ORDER BY ${sort_by} ${order}
+        ;
     `
     return db.query(queryStr).then(({ rows }) => {
-        rows[0].comment_count = parseInt(rows[0].comment_count)
+        if (rows.length) rows[0].comment_count = parseInt(rows[0].comment_count)
         return rows
     })
 }
