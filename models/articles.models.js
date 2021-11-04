@@ -34,7 +34,9 @@ exports.updateArticleVotes = (id, votes) => {
         return result
     })
 }
-exports.selectArticles = (sort_by = 'created_at') => {
+exports.selectArticles = (sort_by = 'created_at', order = 'desc') => {
+    const validOrders = ['asc','desc']
+    if (!validOrders.includes(order)) throw { status: 400, msg: 'Invalid query'}
     const queryStr = `
         SELECT articles.*, COUNT(comments.author)
         AS comment_count
@@ -42,7 +44,7 @@ exports.selectArticles = (sort_by = 'created_at') => {
         LEFT JOIN comments AS comments
         ON articles.article_id = comments.article_id
         GROUP BY articles.article_id
-        ORDER BY ${sort_by} DESC;
+        ORDER BY ${sort_by} ${order};
     `
     return db.query(queryStr).then(({ rows }) => {
         rows[0].comment_count = parseInt(rows[0].comment_count)

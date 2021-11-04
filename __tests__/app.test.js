@@ -188,30 +188,39 @@ describe('/api/articles', () => {
             })
 
             it('status:200, sorts by the field passed in the query', () => {
-                const testSortBy = (sortBy) => {
-                    return request(app)
-                        .get(`/api/articles?sort_by=${sortBy}`)
-                        .expect(200)
-                        .then(({ body }) => {
-                            const { articles } = body
-                            expect(articles).toBeSortedBy(sortBy, {
-                                descending: true,
-                            })
-                        })
-                }
-                const queriesToTest = [
-                    'author',
-                    'title',
-                    'article_id',
-                    'topic',
-                    'created_at',
-                    'votes',
-                    'comment_count',
-                ]
+                // const testSortBy = (sortBy) => {
+                //     return request(app)
+                //         .get(`/api/articles?sort_by=${sortBy}`)
+                //         .expect(200)
+                //         .then(({ body }) => {
+                //             const { articles } = body
+                //             expect(articles).toBeSortedBy(sortBy, {
+                //                 descending: true,
+                //             })
+                //         })
+                // }
+                // const queriesToTest = [
+                //     'author',
+                //     'title',
+                //     'article_id',
+                //     'topic',
+                //     'created_at',
+                //     'votes',
+                //     'comment_count',
+                // ]
                 // queriesToTest.forEach((query) => {
-                    // testSortBy(query)
+                //     testSortBy(query)
                 // })
-                return testSortBy('comment_count')
+                const sortBy = 'comment_count'
+                return request(app)
+                    .get(`/api/articles?sort_by=${sortBy}`)
+                    .expect(200)
+                    .then(({ body }) => {
+                        const { articles } = body
+                        expect(articles).toBeSortedBy(sortBy, {
+                            descending: true,
+                        })
+                    })
             })
             it('status:400, responds with bad request when passed with invalid column', () => {
                 return request(app)
@@ -222,6 +231,38 @@ describe('/api/articles', () => {
                             msg: 'Invalid query',
                         })
                     })
+            })
+        })
+        describe('?order', () => {
+            it('status:200, orders the sorted articles ascending or descending', () => {
+                return request(app)
+                    .get(`/api/articles?order=asc`)
+                    .expect(200)
+                    .then(({ body }) => {
+                        const { articles } = body
+                        expect(articles).toBeSortedBy('created_at')
+                    })
+                    .then(() => {
+                        return request(app)
+                            .get(`/api/articles?order=desc`)
+                            .expect(200)
+                            .then(({ body }) => {
+                                const { articles } = body
+                                expect(articles).toBeSortedBy('created_at', {
+                                    descending: true,
+                                })
+                            })
+                    })
+            })
+            it('status:400, responds with bad request when passed with invalid order', () => {
+                return request(app)
+                .get(`/api/articles?order=notAnOrder`)
+                .expect(400)
+                .then(({body}) => {
+                    expect(body).toEqual({
+                        msg: 'Invalid query'
+                    })
+                })
             })
         })
     })
