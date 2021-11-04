@@ -4,6 +4,8 @@ const {
     selectArticles,
 } = require('../models/articles.models')
 
+const { selectTopicSlugs } = require('../models/topics.models')
+
 exports.getArticleById = ({ params }, res, next) => {
     const id = params.id
     return selectArticleById(id)
@@ -26,10 +28,12 @@ exports.patchArticleVotes = ({ params, body }, res, next) => {
 }
 
 exports.getArticles = (req, res, next) => {
-    const { sort_by, order, topic } = req.query
-    return selectArticles(sort_by, order, topic)
-        .then((result) => {
-            return res.status(200).send({ articles: result })
-        })
-        .catch(next)
+    return selectTopicSlugs().then((validTopics) => {
+        const { sort_by, order, topic } = req.query
+        return selectArticles(sort_by, order, topic, validTopics)
+            .then((result) => {
+                return res.status(200).send({ articles: result })
+            })
+            .catch(next)
+    })
 }

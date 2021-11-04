@@ -9,7 +9,8 @@ exports.selectArticleById = (id) => {
         LEFT JOIN comments AS comments
         ON articles.article_id = comments.article_id
         WHERE articles.article_id = $1
-        GROUP BY articles.article_id;
+        GROUP BY articles.article_id
+        ;
     `
     return db.query(queryStr, [id]).then(({ rows }) => {
         if (rows.length === 0) {
@@ -28,17 +29,26 @@ exports.updateArticleVotes = (id, votes) => {
         UPDATE articles
         SET votes = votes + $1
         WHERE articles.article_id = $2
-        RETURNING *;
+        RETURNING *
+        ;
     `
     return db.query(queryStr, [votes, id]).then((result) => {
         return result
     })
 }
-exports.selectArticles = (sort_by = 'created_at', order = 'desc', topic) => {
+exports.selectArticles = (
+    sort_by = 'created_at',
+    order = 'desc',
+    topic,
+    validTopics
+) => {
     const validOrders = ['asc', 'desc']
 
+    if (topic !== undefined && !validTopics.includes(topic))
+        return Promise.reject({ status: 400, msg: `Invalid topic: ${topic}` })
+
     if (!validOrders.includes(order))
-        throw { status: 400, msg: 'Invalid query' }
+        return Promise.reject({ status: 400, msg: 'Invalid query' })
 
     let queryStr = `
         SELECT articles.*, COUNT(comments.author)
@@ -64,7 +74,7 @@ exports.selectArticles = (sort_by = 'created_at', order = 'desc', topic) => {
                 msg: `No articles found with topic: ${topic}`,
             })
         }
-        if (rows.length) rows[0].comment_count = parseInt(rows[0].comment_count)
+        rows[0].comment_count = parseInt(rows[0].comment_count)
         return rows
     })
 }

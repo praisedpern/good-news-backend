@@ -5,3 +5,11 @@ exports.selectTopics = () => {
         return rows
     })
 }
+
+exports.selectTopicSlugs = () => {
+    return db.query('SELECT slug FROM topics').then(({ rows }) => {
+        return rows.map(row => {
+            return row.slug
+        })
+    })
+}

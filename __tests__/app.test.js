@@ -285,12 +285,20 @@ describe('/api/articles', () => {
                 })
             })
             it('status:404, responds with not found if no articles with topic found', () => {
-                const topicToUse = 'notATopic'
+                const topicToUse = 'paper'
                 return filterByTopicTest(topicToUse, 404).then(({body}) => {
                     const { msg } = body
                     expect(msg).toBe(`No articles found with topic: ${topicToUse}`)
                 })
             })
+            it('status:400, responds with bad request when topic does not exist', () => {
+                const topicToUse = 'notATopic'
+                return filterByTopicTest(topicToUse, 400).then(({body}) => {
+                    const { msg } = body
+                    expect(msg).toBe(`Invalid topic: ${topicToUse}`)
+                })
+            })
+            
         })
     })
 })
