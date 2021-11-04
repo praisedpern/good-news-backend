@@ -175,17 +175,6 @@ describe('/api/articles', () => {
                 })
         })
         describe('?sort_by', () => {
-            const testSortBy = (sortBy = 'created_at') => {
-                return request(app)
-                    .get(`/api/articles?sort_by=${sortBy}`)
-                    .expect(200)
-                    .then(({ body }) => {
-                        const { articles } = body
-                        expect(articles).toBeSortedBy(sortBy, {
-                            descending: true,
-                        })
-                    })
-            }
             it('status:200, sorts by date, descending by default', () => {
                 return request(app)
                     .get(`/api/articles`)
@@ -197,8 +186,42 @@ describe('/api/articles', () => {
                         })
                     })
             })
+
             it('status:200, sorts by the field passed in the query', () => {
-                return testSortBy('author')
+                const testSortBy = (sortBy) => {
+                    return request(app)
+                        .get(`/api/articles?sort_by=${sortBy}`)
+                        .expect(200)
+                        .then(({ body }) => {
+                            const { articles } = body
+                            expect(articles).toBeSortedBy(sortBy, {
+                                descending: true,
+                            })
+                        })
+                }
+                const queriesToTest = [
+                    'author',
+                    'title',
+                    'article_id',
+                    'topic',
+                    'created_at',
+                    'votes',
+                    'comment_count',
+                ]
+                // queriesToTest.forEach((query) => {
+                    // testSortBy(query)
+                // })
+                return testSortBy('comment_count')
+            })
+            it('status:400, responds with bad request when passed with invalid column', () => {
+                return request(app)
+                    .get(`/api/articles?sort_by=notAQuery`)
+                    .expect(400)
+                    .then(({ body }) => {
+                        expect(body).toEqual({
+                            msg: 'Invalid query',
+                        })
+                    })
             })
         })
     })

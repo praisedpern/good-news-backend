@@ -45,6 +45,7 @@ exports.selectArticles = (sort_by = 'created_at') => {
         ORDER BY ${sort_by} DESC;
     `
     return db.query(queryStr).then(({ rows }) => {
+        rows[0].comment_count = parseInt(rows[0].comment_count)
         return rows
     })
 }

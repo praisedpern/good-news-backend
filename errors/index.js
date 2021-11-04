@@ -3,6 +3,13 @@ exports.handlePsqlErrors = (err, req, res, next) => {
         case '22P02':
             res.status(400).send({ msg: 'Invalid ID' })
             break
+        case '42703':
+            res.status(400).send({ msg: 'Invalid query' })
+            break
+        case '42P01':
+            console.log(err)
+            res.status(500).send({ msg: 'Internal server error' })
+            break
         default:
             next(err)
     }

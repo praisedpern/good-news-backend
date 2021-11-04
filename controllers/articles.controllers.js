@@ -30,4 +30,5 @@ exports.getArticles = (req, res, next) => {
     return selectArticles(sort_by).then((result) => {
         return res.status(200).send({ articles: result })
     })
+    .catch(next)
 }
