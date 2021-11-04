@@ -42,12 +42,10 @@ exports.selectArticles = (
     topic,
     validTopics
 ) => {
-    const validOrders = ['asc', 'desc']
-
     if (topic !== undefined && !validTopics.includes(topic))
         return Promise.reject({ status: 400, msg: `Invalid topic: ${topic}` })
 
-    if (!validOrders.includes(order))
+    if (!['asc','desc'].includes(order))
         return Promise.reject({ status: 400, msg: 'Invalid query' })
 
     let queryStr = `
@@ -56,11 +54,11 @@ exports.selectArticles = (
         FROM articles
         LEFT JOIN comments AS comments
         ON articles.article_id = comments.article_id
-        `
+    `
     if (topic) {
         queryStr += `
         WHERE topic = '${topic}'
-        `
+    `
     }
     queryStr += `
         GROUP BY articles.article_id
