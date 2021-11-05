@@ -429,7 +429,7 @@ describe('/api/articles:article_id/comments', () => {
         })
     })
     describe('POST', () => {
-        postArticleObj = {
+        const postArticleObj = {
             username: 'butter_bridge',
             body: 'This must be where pies go when they die',
         }
@@ -480,7 +480,21 @@ describe('/api/articles:article_id/comments', () => {
                     expect(msg).toEqual(`Article not found`)
                 })
         })
-        it.skip('status:400, returns bad request when passed with invalid username', () => {})
-        // TODO, what happens on post requests when none or incorrect comment content passed in?
+        it('status:404, returns not found when passed with invalid username', () => {
+            const newArticleObj = {
+                username: 'killer_bob',
+                body: 'Through the darkness of future past, the magician longs to see, one chance out between two worlds, fire walk with me!',
+            }
+            const idToUse = 1
+            return request(app)
+                .post(`/api/articles/${idToUse}/comments`)
+                .send(newArticleObj)
+                .expect(404)
+                .then(({ body }) => {
+                    const { msg } = body
+                    expect(msg).toEqual(`Username not found`)
+                })
+        })
     })
+    // TODO, what happens on post requests when none or incorrect comment content passed in?
 })

@@ -11,7 +11,10 @@ exports.handlePsqlErrors = (err, req, res, next) => {
             res.status(500).send({ msg: 'Internal server error' })
             break
         case '23503':
-            res.status(404).send({ msg: `Article not found` })
+            const responseMsg = err.detail.match('articles')
+                ? 'Article'
+                : 'Username'
+            res.status(404).send({ msg: `${responseMsg} not found` })
             break
         default:
             next(err)
