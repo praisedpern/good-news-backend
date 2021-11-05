@@ -318,15 +318,16 @@ describe('/api/articles', () => {
                 queryArray.forEach((query, index) => {
                     if (query !== null) {
                         if (queryCounter > 0) endpointStr += '&'
+                        else endpointStr += '?'
                         switch (index) {
                             case 0:
-                                endpointStr += `?sort_by=`
+                                endpointStr += `sort_by=`
                                 break
                             case 1:
-                                endpointStr += `?order=`
+                                endpointStr += `order=`
                                 break
                             case 2:
-                                endpointStr += `?topic=`
+                                endpointStr += `topic=`
                                 break
                         }
                         endpointStr += `${query}`
@@ -335,15 +336,14 @@ describe('/api/articles', () => {
                 })
                 return endpointStr
             }
-            it.skip('status:200, responds correctly to queries combined together', () => {
+            it('status:200, responds correctly to queries combined together', () => {
                 return request(app)
                     .get(multipleQueryTest('author', 'asc', 'mitch'))
                     .expect(200)
                     .then(({ body }) => {
                         const { articles } = body
-                        console.log(articles)
                         expect(articles).toBeSortedBy('author', {
-                            descending: true,
+                            descending: false,
                         })
                         articles.forEach((article) => {
                             expect(article).toEqual(
@@ -352,6 +352,24 @@ describe('/api/articles', () => {
                                 })
                             )
                         })
+                    })
+                    .then(()=>{
+                return request(app)
+                    .get(multipleQueryTest('created_at', 'desc', 'cats'))
+                    .expect(200)
+                    .then(({ body }) => {
+                        const { articles } = body
+                        expect(articles).toBeSortedBy('created_at', {
+                            descending: true,
+                        })
+                        articles.forEach((article) => {
+                            expect(article).toEqual(
+                                expect.objectContaining({
+                                    topic: 'cats',
+                                })
+                            )
+                        })
+                    })
                     })
             })
         })
