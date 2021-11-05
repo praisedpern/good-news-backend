@@ -34,7 +34,7 @@ exports.insertIntoComments = (articleId, body, validUsernames) => {
     `,
         [body.username, articleId, body.body]
     )
-    return db.query(queryStr).then(({ rows }) => {
-        return rows[0]
+    return db.query(queryStr).then((result) => {
+        return result.rows[0]
     })
 }

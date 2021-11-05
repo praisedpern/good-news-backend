@@ -429,12 +429,12 @@ describe('/api/articles:article_id/comments', () => {
         })
     })
     describe('POST', () => {
+        postArticleObj = {
+            username: 'butter_bridge',
+            body: 'This must be where pies go when they die',
+        }
         it('status:201, successfully create new comment', () => {
             const idToUse = 1
-            postArticleObj = {
-                username: 'butter_bridge',
-                body: 'This must be where pies go when they die',
-            }
             return request(app)
                 .post(`/api/articles/${idToUse}/comments`)
                 .send(postArticleObj)
@@ -469,5 +469,18 @@ describe('/api/articles:article_id/comments', () => {
                         })
                 })
         })
+        it('status:404, returns not found when article not found', () => {
+            const idToUse = 9999
+            return request(app)
+                .post(`/api/articles/${idToUse}/comments`)
+                .send(postArticleObj)
+                .expect(404)
+                .then(({ body }) => {
+                    const { msg } = body
+                    expect(msg).toEqual(`Article not found`)
+                })
+        })
+        it.skip('status:400, returns bad request when passed with invalid username', () => {})
+        // TODO, what happens on post requests when none or incorrect comment content passed in?
     })
 })
