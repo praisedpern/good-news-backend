@@ -405,5 +405,69 @@ describe('/api/articles:article_id/comments', () => {
                     })
                 })
         })
+        it('status:400, responds with bad request if invalid article id passed', () => {
+            const idToUse = 'notAnId'
+            return request(app)
+                .get(`/api/articles/${idToUse}/comments`)
+                .expect(400)
+                .then(({ body }) => {
+                    const { msg } = body
+                    expect(msg).toBe(`Invalid ID`)
+                })
+        })
+        it('status:404, responds with not found when article not present or no comments', () => {
+            const idToUse = 9001
+            return request(app)
+                .get(`/api/articles/${idToUse}/comments`)
+                .expect(404)
+                .then(({ body }) => {
+                    const { msg } = body
+                    expect(msg).toBe(
+                        `No comments found for article: ${idToUse}`
+                    )
+                })
+        })
+    })
+    describe('POST', () => {
+        it('status:201, successfully create new comment', () => {
+            const idToUse = 1
+            postArticleObj = {
+                username: 'butter_bridge',
+                body: 'This must be where pies go when they die',
+            }
+            return request(app)
+                .post(`/api/articles/${idToUse}/comments`)
+                .send(postArticleObj)
+                .expect(201)
+                .then(({ body }) => {
+                    const { comment } = body
+                    expect(comment).toEqual(
+                        expect.objectContaining({
+                            comment_id: expect.any(Number),
+                            votes: expect.any(Number),
+                            created_at: expect.stringMatching(validTimestamp),
+                            author: expect.stringMatching(
+                                postArticleObj.username
+                            ),
+                            body: expect.stringMatching(postArticleObj.body),
+                        })
+                    )
+                })
+                .then(() => {
+                    return request(app)
+                        .get(`/api/articles/${idToUse}/comments`)
+                        .expect(200)
+                        .then(({ body }) => {
+                            const { comments } = body
+                            const originalComments =
+                                testData.commentData.filter(
+                                    (comment) => comment.article_id === idToUse
+                                )
+                            expect(comments.length).toEqual(
+                                originalComments.length + 1
+                            )
+                        })
+                })
+        })
     })
 })

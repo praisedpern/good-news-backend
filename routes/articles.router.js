@@ -3,10 +3,12 @@ const {
     getArticleById,
     patchArticleVotes,
     getArticles,
-    getArticleComments,
+    getCommentsByArticleId,
+    postCommentByArticleId,
 } = require('../controllers/articles.controllers')
 
-articlesRouter.get('/:id/comments', getArticleComments)
+articlesRouter.get('/:id/comments', getCommentsByArticleId)
+articlesRouter.post('/:id/comments', postCommentByArticleId)
 articlesRouter.get('/:id', getArticleById)
 articlesRouter.patch('/:id', patchArticleVotes)
 articlesRouter.get('/', getArticles)

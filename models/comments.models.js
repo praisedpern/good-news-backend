@@ -1,7 +1,7 @@
 const db = require('../db/connection')
 const format = require('pg-format')
 
-exports.selectArticleComments = (id) => {
+exports.selectArticleComments = (articleId) => {
     return db
         .query(
             `
@@ -11,9 +11,30 @@ exports.selectArticleComments = (id) => {
         WHERE article_id = $1
         ;
     `,
-            [id]
+            [articleId]
         )
         .then(({ rows }) => {
+            if (rows.length === 0) {
+                return Promise.reject({
+                    status: 404,
+                    msg: `No comments found for article: ${articleId}`,
+                })
+            }
             return rows
         })
+}
+exports.insertIntoComments = (articleId, body, validUsernames) => {
+    let queryStr = format(
+        `
+        INSERT INTO comments
+        (author, article_id, body)
+        VALUES (%L)
+        RETURNING *
+        ;
+    `,
+        [body.username, articleId, body.body]
+    )
+    return db.query(queryStr).then(({ rows }) => {
+        return rows[0]
+    })
 }
