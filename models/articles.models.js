@@ -46,7 +46,7 @@ exports.selectArticles = (
         return Promise.reject({ status: 400, msg: `Invalid topic: ${topic}` })
 
     if (!['asc','desc'].includes(order))
-        return Promise.reject({ status: 400, msg: 'Invalid query' })
+        return Promise.reject({ status: 400, msg: `Invalid query: ${order}` })
 
     let queryStr = `
         SELECT articles.*, COUNT(comments.author)
@@ -72,7 +72,9 @@ exports.selectArticles = (
                 msg: `No articles found with topic: ${topic}`,
             })
         }
-        rows[0].comment_count = parseInt(rows[0].comment_count)
+        rows.forEach(row => {
+            row.comment_count = parseInt(row.comment_count)
+        })
         return rows
     })
 }

@@ -162,15 +162,18 @@ describe('/api/articles', () => {
                     expect(articles).toBeInstanceOf(Array)
                     expect(articles).toHaveLength(testData.articleData.length)
                     articles.forEach((article) => {
-                        expect.objectContaining({
-                            author: expect.any(String),
-                            title: expect.any(String),
-                            article_id: expect.any(Number),
-                            topic: expect.any(String),
-                            created_at: expect.stringMatching(validTimestamp),
-                            votes: expect.any(Number),
-                            comment_count: expect.any(Number),
-                        })
+                        expect(article).toEqual(
+                            expect.objectContaining({
+                                body: expect.any(String),
+                                author: expect.any(String),
+                                title: expect.any(String),
+                                article_id: expect.any(Number),
+                                topic: expect.any(String),
+                                created_at: expect.stringMatching(validTimestamp),
+                                votes: expect.any(Number),
+                                comment_count: expect.any(Number),
+                            })
+                        )
                     })
                 })
         })
@@ -255,12 +258,13 @@ describe('/api/articles', () => {
                     })
             })
             it('status:400, responds with bad request when passed with invalid order', () => {
+                const orderToUse = 'notAnOrder'
                 return request(app)
-                    .get(`/api/articles?order=notAnOrder`)
+                    .get(`/api/articles?order=${orderToUse}`)
                     .expect(400)
                     .then(({ body }) => {
                         expect(body).toEqual({
-                            msg: 'Invalid query',
+                            msg: `Invalid query: ${orderToUse}`,
                         })
                     })
             })
@@ -286,19 +290,70 @@ describe('/api/articles', () => {
             })
             it('status:404, responds with not found if no articles with topic found', () => {
                 const topicToUse = 'paper'
-                return filterByTopicTest(topicToUse, 404).then(({body}) => {
+                return filterByTopicTest(topicToUse, 404).then(({ body }) => {
                     const { msg } = body
-                    expect(msg).toBe(`No articles found with topic: ${topicToUse}`)
+                    expect(msg).toBe(
+                        `No articles found with topic: ${topicToUse}`
+                    )
                 })
             })
             it('status:400, responds with bad request when topic does not exist', () => {
                 const topicToUse = 'notATopic'
-                return filterByTopicTest(topicToUse, 400).then(({body}) => {
+                return filterByTopicTest(topicToUse, 400).then(({ body }) => {
                     const { msg } = body
                     expect(msg).toBe(`Invalid topic: ${topicToUse}`)
                 })
             })
-            
+        })
+        describe('?sort_by=&?order=&?topic=', () => {
+            const multipleQueryTest = (
+                sort_by = null,
+                order = null,
+                topic = null
+            ) => {
+                let endpointStr = '/api/articles'
+                const queryArray = [sort_by, order, topic]
+                let queryCounter = 0
+
+                queryArray.forEach((query, index) => {
+                    if (query !== null) {
+                        if (queryCounter > 0) endpointStr += '&'
+                        switch (index) {
+                            case 0:
+                                endpointStr += `?sort_by=`
+                                break
+                            case 1:
+                                endpointStr += `?order=`
+                                break
+                            case 2:
+                                endpointStr += `?topic=`
+                                break
+                        }
+                        endpointStr += `${query}`
+                        queryCounter++
+                    }
+                })
+                return endpointStr
+            }
+            it.skip('status:200, responds correctly to queries combined together', () => {
+                return request(app)
+                    .get(multipleQueryTest('author', 'asc', 'mitch'))
+                    .expect(200)
+                    .then(({ body }) => {
+                        const { articles } = body
+                        console.log(articles)
+                        expect(articles).toBeSortedBy('author', {
+                            descending: true,
+                        })
+                        articles.forEach((article) => {
+                            expect(article).toEqual(
+                                expect.objectContaining({
+                                    topic: 'mitch',
+                                })
+                            )
+                        })
+                    })
+            })
         })
     })
 })
