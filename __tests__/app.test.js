@@ -500,7 +500,7 @@ describe('/api/articles/:article_id/comments', () => {
 })
 describe('/api/comments/:comment_id', () => {
     describe('DELETE', () => {
-        it.skip('status:204, returns no content ', () => {
+        it('status:204, returns no content ', () => {
             const idToUse = 1
             return request(app)
                 .delete(`/api/comments/${idToUse}`)
@@ -510,15 +510,30 @@ describe('/api/comments/:comment_id', () => {
                 })
                 .then(() => {
                     return request(app)
-                        .get('/api/articles/2/comments')
+                        .get('/api/articles/1/comments')
                         .expect(200)
-                        .then(({body}) => {
-                            const {comments} = body
-                            expect(comments.length).toEqual(
-                                testData.commentData.length - 1
-                            )
+                        .then(({ body }) => {
+                            const { comments } = body
+                            comments.forEach((comment) => {
+                                expect(comment).not.toEqual(
+                                    expect.objectContaining({
+                                        comment_id: 1,
+                                    })
+                                )
+                            })
                         })
                 })
         })
+        it('status:404, should return not found when comment to delete not in db', () => {
+            const idToUse = 9000
+            return request(app)
+                .delete(`/api/comments/${idToUse}`)
+                .expect(404)
+                .then(({body})=> {
+                    const {msg} = body
+                    expect(msg).toEqual(`No comments found with ID: ${idToUse}`)
+                })
+        })
+        
     })
 })

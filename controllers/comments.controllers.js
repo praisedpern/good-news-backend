@@ -5,4 +5,5 @@ exports.deleteComment = ({ params }, res, next) => {
     return deleteFromComments(id).then(() => {
         return res.status(204).send()
     })
+    .catch(next)
 }

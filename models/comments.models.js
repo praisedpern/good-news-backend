@@ -39,12 +39,21 @@ exports.insertIntoComments = (articleId, body, validUsernames) => {
     })
 }
 
-exports.deleteFromComments = (id) => {
+exports.deleteFromComments = (commentId) => {
     const queryStr =
     `
         DELETE FROM comments
         WHERE comment_id = $1
+        RETURNING *
         ;
     `
-    return db.query(queryStr, [id])
+    return db.query(queryStr, [commentId]).then(({rows})=> {
+        if (rows[0] === undefined) {
+            return Promise.reject({
+                status: 404,
+                msg: `No comments found with ID: ${commentId}`,
+            })
+        }
+        return
+    })
 }
