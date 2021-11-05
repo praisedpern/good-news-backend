@@ -378,7 +378,7 @@ describe('/api/articles', () => {
         })
     })
 })
-describe('/api/articles:article_id/comments', () => {
+describe('/api/articles/:article_id/comments', () => {
     describe('GET', () => {
         it('status:200, responds with an array of comments for given article id', () => {
             const articleIdToUse = 3
@@ -497,4 +497,28 @@ describe('/api/articles:article_id/comments', () => {
         })
     })
     // TODO, what happens on post requests when none or incorrect comment content passed in?
+})
+describe('/api/comments/:comment_id', () => {
+    describe('DELETE', () => {
+        it.skip('status:204, returns no content ', () => {
+            const idToUse = 1
+            return request(app)
+                .delete(`/api/comments/${idToUse}`)
+                .expect(204)
+                .then(({ body }) => {
+                    expect(body).toEqual({})
+                })
+                .then(() => {
+                    return request(app)
+                        .get('/api/articles/2/comments')
+                        .expect(200)
+                        .then(({body}) => {
+                            const {comments} = body
+                            expect(comments.length).toEqual(
+                                testData.commentData.length - 1
+                            )
+                        })
+                })
+        })
+    })
 })

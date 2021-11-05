@@ -38,3 +38,13 @@ exports.insertIntoComments = (articleId, body, validUsernames) => {
         return result.rows[0]
     })
 }
+
+exports.deleteFromComments = (id) => {
+    const queryStr =
+    `
+        DELETE FROM comments
+        WHERE comment_id = $1
+        ;
+    `
+    return db.query(queryStr, [id])
+}
