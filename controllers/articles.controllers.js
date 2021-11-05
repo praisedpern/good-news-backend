@@ -6,6 +6,8 @@ const {
 
 const { selectTopicSlugs } = require('../models/topics.models')
 
+const { selectArticleComments } = require('../models/comments.models')
+
 exports.getArticleById = ({ params }, res, next) => {
     const id = params.id
     return selectArticleById(id)
@@ -36,4 +38,13 @@ exports.getArticles = (req, res, next) => {
             })
             .catch(next)
     })
+}
+
+exports.getArticleComments = ({ params }, res, next) => {
+    const { id } = params
+    return selectArticleComments(id)
+        .then((result) => {
+            return res.status(200).send({ comments: result })
+        })
+        .catch(next)
 }

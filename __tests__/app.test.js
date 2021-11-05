@@ -169,7 +169,8 @@ describe('/api/articles', () => {
                                 title: expect.any(String),
                                 article_id: expect.any(Number),
                                 topic: expect.any(String),
-                                created_at: expect.stringMatching(validTimestamp),
+                                created_at:
+                                    expect.stringMatching(validTimestamp),
                                 votes: expect.any(Number),
                                 comment_count: expect.any(Number),
                             })
@@ -353,25 +354,56 @@ describe('/api/articles', () => {
                             )
                         })
                     })
-                    .then(()=>{
-                return request(app)
-                    .get(multipleQueryTest('created_at', 'desc', 'cats'))
-                    .expect(200)
-                    .then(({ body }) => {
-                        const { articles } = body
-                        expect(articles).toBeSortedBy('created_at', {
-                            descending: true,
-                        })
-                        articles.forEach((article) => {
-                            expect(article).toEqual(
-                                expect.objectContaining({
-                                    topic: 'cats',
-                                })
+                    .then(() => {
+                        return request(app)
+                            .get(
+                                multipleQueryTest('created_at', 'desc', 'cats')
                             )
-                        })
-                    })
+                            .expect(200)
+                            .then(({ body }) => {
+                                const { articles } = body
+                                expect(articles).toBeSortedBy('created_at', {
+                                    descending: true,
+                                })
+                                articles.forEach((article) => {
+                                    expect(article).toEqual(
+                                        expect.objectContaining({
+                                            topic: 'cats',
+                                        })
+                                    )
+                                })
+                            })
                     })
             })
+        })
+    })
+})
+describe('/api/articles:article_id/comments', () => {
+    describe('GET', () => {
+        it('status:200, responds with an array of comments for given article id', () => {
+            const articleIdToUse = 3
+            return request(app)
+                .get(`/api/articles/${articleIdToUse}/comments`)
+                .expect(200)
+                .then(({ body }) => {
+                    const { comments } = body
+                    const originalComments = testData.commentData.filter(
+                        (comment) => comment.article_id === articleIdToUse
+                    )
+                    expect(comments.length).toEqual(originalComments.length)
+                    comments.forEach((comment) => {
+                        expect(comment).toEqual(
+                            expect.objectContaining({
+                                comment_id: expect.any(Number),
+                                votes: expect.any(Number),
+                                created_at:
+                                    expect.stringMatching(validTimestamp),
+                                author: expect.any(String),
+                                body: expect.any(String),
+                            })
+                        )
+                    })
+                })
         })
     })
 })
