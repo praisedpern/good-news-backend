@@ -13,6 +13,10 @@ const patchArticleObj = {
     inc_votes: 1,
 }
 
+const wrongArticleObj = {
+    increment_votes: 1,
+}
+
 beforeEach(() => {
     patchArticleObj.inc_votes = 1
 })
@@ -118,7 +122,7 @@ describe('/api/articles/:article_id', () => {
                     return request(app)
                         .patch(`/api/articles/${idToUse}`)
                         .send(patchArticleObj)
-                        .expect(202)
+                        .expect(200)
                         .then(({ body }) => {
                             expect(body).toEqual(responseToCompare)
                         })
@@ -135,6 +139,18 @@ describe('/api/articles/:article_id', () => {
                 .then(({ body }) => {
                     const { msg } = body
                     expect(msg).toEqual(`Invalid ID`)
+                })
+        })
+        it('status:400, responds with bad request when passed an object with invalid keys', () => {
+            const idToUse = 1
+
+            return request(app)
+                .patch(`/api/articles/${idToUse}`)
+                .send(wrongArticleObj)
+                .expect(400)
+                .then(({ body }) => {
+                    const { msg } = body
+                    expect(msg).toEqual(`Invalid property in request body`)
                 })
         })
         it('status:404. responds with not found when passed ID not found in db', () => {

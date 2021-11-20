@@ -10,6 +10,9 @@ exports.handlePsqlErrors = (err, req, res, next) => {
             console.log(err)
             res.status(500).send({ msg: 'Internal server error' })
             break
+        case '23502':
+            res.status(400).send({msg: 'Invalid property in request body'})
+        break
         case '23503':
             const responseMsg = err.detail.match('articles')
                 ? 'Article'
