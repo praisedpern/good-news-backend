@@ -100,7 +100,7 @@ describe('/api/articles/:article_id', () => {
         })
     })
     describe('PATCH', () => {
-        it('status:202, responds with the updated article object', () => {
+        it('status:200, responds with the updated article object', () => {
             const idToUse = 1
             patchArticleObj.inc_votes = 1
 
@@ -148,6 +148,7 @@ describe('/api/articles/:article_id', () => {
                     expect(msg).toEqual(`ID not found: ${idToUse}`)
                 })
         })
+        // TODO more thorough testing on inc/dec of votes
     })
 })
 
@@ -529,11 +530,61 @@ describe('/api/comments/:comment_id', () => {
             return request(app)
                 .delete(`/api/comments/${idToUse}`)
                 .expect(404)
-                .then(({body})=> {
-                    const {msg} = body
+                .then(({ body }) => {
+                    const { msg } = body
                     expect(msg).toEqual(`No comments found with ID: ${idToUse}`)
                 })
         })
-        
+    })
+})
+describe('/api', () => {
+    describe('GET', () => {
+        it('status:200, should return an object containing all available endpoints', () => {
+            return request(app)
+                .get('/api')
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body).toEqual(
+                        expect.objectContaining({
+                            'GET /api': {
+                                description:
+                                    'serves up a json representation of all the available endpoints of the api',
+                            },
+                            'GET /api/topics': {
+                                description: 'serves an array of all topics',
+                                queries: [],
+                                exampleResponse: {
+                                    topics: [
+                                        {
+                                            slug: 'football',
+                                            description: 'Footie!',
+                                        },
+                                    ],
+                                },
+                            },
+                            'GET /api/articles': {
+                                description: 'serves an array of all topics',
+                                queries: [
+                                    'author',
+                                    'topic',
+                                    'sort_by',
+                                    'order',
+                                ],
+                                exampleResponse: {
+                                    articles: [
+                                        {
+                                            title: 'Seafood substitutions are increasing',
+                                            topic: 'cooking',
+                                            author: 'weegembump',
+                                            body: 'Text from the article..',
+                                            created_at: 1527695953341,
+                                        },
+                                    ],
+                                },
+                            },
+                        })
+                    )
+                })
+        })
     })
 })
