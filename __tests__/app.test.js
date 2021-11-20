@@ -633,6 +633,16 @@ describe('/api/comments/:comment_id', () => {
                     expect(msg).toEqual(`No comments found with ID: ${idToUse}`)
                 })
         })
+        it('status:400, should return bad request when passed with invalid ID', () => {
+            const idToUse = 'Audrey Horne'
+            return request(app)
+                .delete(`/api/comments/${idToUse}`)
+                .expect(400)
+                .then(({ body }) => {
+                    const { msg } = body
+                    expect(msg).toEqual(`Invalid ID`)
+                })
+        })
     })
 })
 describe('/api', () => {
