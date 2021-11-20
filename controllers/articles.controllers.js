@@ -28,7 +28,7 @@ exports.patchArticleVotes = ({ params, body }, res, next) => {
     return updateArticleVotes(id, votes)
         .then(() => {
             return selectArticleById(id).then((result) => {
-                return res.status(202).send({ article: result })
+                return res.status(200).send({ article: result })
             })
         })
         .catch(next)
