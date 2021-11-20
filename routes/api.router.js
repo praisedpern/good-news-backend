@@ -5,7 +5,7 @@ const commentsRouter = require('./comments.router')
 const apiObject = require('../endpoints.json')
 
 apiRouter.get('/', (req, res, next) => {
-    res.status(200).send(apiObject).catch(next)
+    res.status(200).send(apiObject)
 })
 
 apiRouter.use('/topics', topicsRouter)

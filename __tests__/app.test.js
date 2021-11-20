@@ -150,7 +150,9 @@ describe('/api/articles/:article_id', () => {
                 .expect(400)
                 .then(({ body }) => {
                     const { msg } = body
-                    expect(msg).toEqual(`Invalid property in request body`)
+                    expect(msg).toEqual(
+                        `Invalid or missing property in request body`
+                    )
                 })
         })
         it('status:404. responds with not found when passed ID not found in db', () => {
@@ -450,6 +452,12 @@ describe('/api/articles/:article_id/comments', () => {
             username: 'butter_bridge',
             body: 'This must be where pies go when they die',
         }
+        const wrongPostArticleObj = {
+            usernaame: 'butter_bridge',
+            bodhi: 'This must be where pies go when they die',
+        }
+        const emptyPostArticleObj = {}
+
         it('status:201, successfully create new comment', () => {
             const idToUse = 1
             return request(app)
@@ -495,6 +503,80 @@ describe('/api/articles/:article_id/comments', () => {
                 .then(({ body }) => {
                     const { msg } = body
                     expect(msg).toEqual(`Article not found`)
+                })
+        })
+        it('status:400, returns not found when passed with invalid ID', () => {
+            const idToUse = 'Leland Palmer'
+            return request(app)
+                .post(`/api/articles/${idToUse}/comments`)
+                .send(postArticleObj)
+                .expect(400)
+                .then(({ body }) => {
+                    const { msg } = body
+                    expect(msg).toEqual(`Invalid ID`)
+                })
+        })
+        it('status:201, ignore unnecessary properties', () => {
+            const idToUse = 1
+            const extraPropsArticleObj = { ...postArticleObj }
+            extraPropsArticleObj.extraPropertyToIgnore = 'ignore me'
+            return request(app)
+                .post(`/api/articles/${idToUse}/comments`)
+                .send(extraPropsArticleObj)
+                .expect(201)
+                .then(({ body }) => {
+                    const { comment } = body
+                    expect(comment).toEqual(
+                        expect.objectContaining({
+                            comment_id: expect.any(Number),
+                            votes: expect.any(Number),
+                            created_at: expect.stringMatching(validTimestamp),
+                            author: expect.stringMatching(
+                                postArticleObj.username
+                            ),
+                            body: expect.stringMatching(postArticleObj.body),
+                        })
+                    )
+                })
+                .then(() => {
+                    return request(app)
+                        .get(`/api/articles/${idToUse}/comments`)
+                        .expect(200)
+                        .then(({ body }) => {
+                            const { comments } = body
+                            const originalComments =
+                                testData.commentData.filter(
+                                    (comment) => comment.article_id === idToUse
+                                )
+                            expect(comments.length).toEqual(
+                                originalComments.length + 1
+                            )
+                        })
+                })
+        })
+        it('status:400, returns bad request when wrong or missing fields in request obj', () => {
+            const idToUse = 1
+            return request(app)
+                .post(`/api/articles/${idToUse}/comments`)
+                .send(wrongPostArticleObj)
+                .expect(400)
+                .then(({ body }) => {
+                    const { msg } = body
+                    expect(msg).toEqual(
+                        `Invalid or missing property in request body`
+                    )
+                })
+                .then(() => {
+                    return request(app)
+                        .post(`/api/articles/${idToUse}/comments`)
+                        .send(emptyPostArticleObj)
+                        .expect(400)
+                        .then(({ body }) => {
+                            const { msg } = body
+                            expect(msg).toEqual(
+                                `Invalid or missing property in request body`
+                            )
+                        })
                 })
         })
         it('status:404, returns not found when passed with invalid username', () => {
