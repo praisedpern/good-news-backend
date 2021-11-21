@@ -7,10 +7,13 @@ const {
     postCommentByArticleId,
 } = require('../controllers/articles.controllers')
 
-articlesRouter.get('/:id/comments', getCommentsByArticleId)
-articlesRouter.post('/:id/comments', postCommentByArticleId)
-articlesRouter.get('/:id', getArticleById)
-articlesRouter.patch('/:id', patchArticleVotes)
+articlesRouter
+    .route('/:id/comments')
+    .get(getCommentsByArticleId)
+    .post(postCommentByArticleId)
+
+articlesRouter.route('/:id').get(getArticleById).patch(patchArticleVotes)
+
 articlesRouter.get('/', getArticles)
 
 module.exports = articlesRouter
