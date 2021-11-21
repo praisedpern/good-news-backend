@@ -2,8 +2,11 @@ const express = require('express')
 const app = express()
 const apiRouter = require('./routes/api.router')
 const {handleCustomErrors, handleServerErrors, handlePsqlErrors} = require('./errors')
+const authCheck = require('./utils/auth-check')
 
 app.use(express.json())
+
+app.use('/*', authCheck)
 
 app.use('/api', apiRouter)
 
