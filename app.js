@@ -1,10 +1,12 @@
 const express = require('express')
+const cors = require('cors')
 const app = express()
 const apiRouter = require('./routes/api.router')
 const {handleCustomErrors, handleServerErrors, handlePsqlErrors} = require('./errors')
 const authCheck = require('./utils/auth-check')
 
 app.use(express.json())
+app.use(cors())
 
 app.use('/*', authCheck)
 
