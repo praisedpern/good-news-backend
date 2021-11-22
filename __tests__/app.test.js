@@ -696,3 +696,23 @@ describe('/api', () => {
         })
     })
 })
+
+describe('/api/users', () => {
+    describe('GET', () => {
+        it("status:200, returns a list of objects with key 'username'", () => {
+            return request(app)
+                .get('/api/users')
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body.length).toEqual(testData.userData.length)
+                    body.forEach((element) => {
+                        expect(element).toEqual(
+                            expect.objectContaining({
+                                username: expect.any(String),
+                            })
+                        )
+                    })
+                })
+        })
+    })
+})
