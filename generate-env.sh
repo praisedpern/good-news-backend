@@ -1,7 +1,7 @@
 #!/bin/bash
 db="PGDATABASE=nc_news"
 prepend="AUTHTOKEN="
-file=.env.developmentttt
+file=.env.development
 
 echo Please enter the token you\'d like to use for your \local development instance:
 
