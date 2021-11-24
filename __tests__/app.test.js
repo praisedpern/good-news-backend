@@ -644,6 +644,29 @@ describe('/api/comments/:comment_id', () => {
                 })
         })
     })
+    describe('PATCH', () => {
+        const patchCommentObj = { inc_votes: 1 }
+        it.only('status:200, should update the votes and return the updated comment', () => {
+            const idToUse = 1
+            return request(app)
+                .patch(`/api/comments/${idToUse}`)
+                .send(patchCommentObj)
+                .expect(200)
+                .then(({ body }) => {
+                    const { comment } = body
+                    expect(comment).toEqual(
+                        expect.objectContaining({
+                            comment_id: expect.any(Number),
+                            votes: expect.any(Number),
+                            created_at: expect.stringMatching(validTimestamp),
+                            author: expect.any(String),
+                            body: expect.any(String),
+                        })
+                    )
+                })
+        })
+    })
+    // TODO write sad path and extend this test to check the votes is different
 })
 describe('/api', () => {
     describe('GET', () => {

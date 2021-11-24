@@ -57,3 +57,23 @@ exports.deleteFromComments = (commentId) => {
         return
     })
 }
+
+exports.updateCommentVotes = (id, votes) => {
+    const queryStr =
+    `
+        UPDATE comments
+        SET votes = votes + $1
+        WHERE comment_id = $2
+        RETURNING *
+        ;
+    `
+    return db.query(queryStr, [votes, id]).then(({rows})=> {
+        if (rows[0] === undefined) {
+            return Promise.reject({
+                status: 404,
+                msg: `No comments found with ID: ${commentId}`,
+            })
+        }
+        return rows[0]
+    })
+}
