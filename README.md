@@ -31,3 +31,5 @@ sudo chmod +x ./generate-env.sh
 To start the local development instance, run `npm start` in your terminal.
 
 To see all available endpoints, send a GET request to /api once the server is running.
+
+This APi is hosted at https://very-good-news.herokuapp.com
