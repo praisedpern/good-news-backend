@@ -1,5 +1,6 @@
-# be-nc-news - Backend Portfolio Project
+# good-news-backend - Backend Portfolio Project
 This is my backend portfolio project, demonstrating a working implementation of a RESTful web API built using MVC framework in JavaScript, with a PostgresQL database.
+
 ## Node Dependencies
 Upon installing, the following dependencies will be automatically installed and configured:
 - express - Node.js web application framework
@@ -8,7 +9,7 @@ Upon installing, the following dependencies will be automatically installed and 
 - dotenv - For loading environment variables from .env files that shouldn't be committed to the repository
 - cors - Express middleware for allowing access to the API from a third party domain
 
-The server also uses the built in `crypto` Node module to enable the storage of sha256 hashes in environmental variables rather than raw values, for basic token authentication.
+The server also uses the built in `crypto` Node module to enable the storage of sha256 hashes in environmental variables rather than raw values, for token authentication.
 ## Requirements
 `git` to clone the repository, `npm` 7.22.0 or higher to install the dependencies, and `psql` to run the database.
 ## Installation
