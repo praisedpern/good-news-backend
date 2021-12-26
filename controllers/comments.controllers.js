@@ -13,7 +13,6 @@ exports.deleteComment = ({ params }, res, next) => {
 }
 
 exports.patchCommentVotes = ({ params, body }, res, next) => {
-    console.log()
     const { id } = params
     const { inc_votes } = body
     return updateCommentVotes(id, inc_votes)
