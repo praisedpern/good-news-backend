@@ -646,7 +646,7 @@ describe('/api/comments/:comment_id', () => {
     })
     describe('PATCH', () => {
         const patchCommentObj = { inc_votes: 1 }
-        it.only('status:200, should update the votes and return the updated comment', () => {
+        it('status:200, should update the votes and return the updated comment', () => {
             const idToUse = 1
             return request(app)
                 .patch(`/api/comments/${idToUse}`)
@@ -722,7 +722,7 @@ describe('/api', () => {
 
 describe('/api/users', () => {
     describe('GET', () => {
-        it("status:200, returns a list of objects with key 'username'", () => {
+        it("status:200, returns an array of objects with key 'username'", () => {
             return request(app)
                 .get('/api/users')
                 .expect(200)
@@ -735,6 +735,27 @@ describe('/api/users', () => {
                             })
                         )
                     })
+                })
+        })
+    })
+})
+
+describe('/api/users/:user_id', () => {
+    describe('GET', () => {
+        it('status:200, returns a single user object', () => {
+            const userToGet = 'rogersop'
+
+            return request(app)
+                .get(`/api/users/${userToGet}`)
+                .expect(200)
+                .then(({ body }) => {
+                    expect(body).toEqual(
+                        expect.objectContaining({
+                            username: expect.any(String),
+                            avatar_url: expect.any(String),
+                            name: expect.any(String),
+                        })
+                    )
                 })
         })
     })
